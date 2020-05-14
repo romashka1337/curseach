@@ -37,7 +37,7 @@ int sc_memoryInit() {
 	}
 }
 
-int sc_memorySet(int address,int value) {
+int sc_memorySet(int address, int value) {
 	if (RAM != NULL) {
 		if (address >= 0 && address <= 99) {
 			RAM[address] = value;
@@ -132,7 +132,7 @@ int sc_commandDecode(int value, int *command, int *operand) {
 }
 
 int sc_instCounterGet(int* value) {
-	value = instCounter;
+	*value = instCounter;
 	return 0;
 }
 

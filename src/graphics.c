@@ -4,14 +4,16 @@ int gr_printMemory(int number) {
 	for (int it = 0, row = 2; it < 100;) {
 		mt_gotoXY(2, row);
 		for (int jt = 0; jt < 10; jt++, it++) {
+			int Memory = 0;
+			sc_memoryGet(it, &Memory);
 			if (it == number) {
 				mt_setbgcolor(yellow);
-				printf("+%.4d", RAM[it]);
+				printf("+%.4X", Memory);
 				mt_setbgcolor(reset);
 				printf(" ");
 			} else {
 				mt_setbgcolor(reset);
-				printf("+%.4u", RAM[it]);
+				printf("+%.4X", Memory);
 				mt_setbgcolor(reset);
 				printf(" ");
 			}
@@ -24,7 +26,8 @@ int gr_printMemory(int number) {
 int gr_printRegFlag(void) {
 	mt_gotoXY(69, 11);
 	for (int it = 0; it < 5; ++it) {
-		int CheckBitRegister = (register_flag >> it) & 1;
+		int CheckBitRegister = 0;
+		sc_regGet(it, &CheckBitRegister);
 		if (CheckBitRegister == 1) {
 			mt_setfgcolor(yellow);
 			printf("%d ", it);
@@ -84,7 +87,7 @@ int gr_drawBCH(int digit) {
 	long int BigDigit[2] = {0};
 	bc_setBCH('+', BigDigit);
 	bc_printbigchar(BigDigit, 2, 14, magenta, magenta);
-	sprintf(str, "%.4d", digit);
+	sprintf(str, "%.4X", digit);
 	for(int it = 0, x = 11; it < 4; ++it, x += 9) {
 		bc_setBCH(str[it], BigDigit);
 		bc_printbigchar(BigDigit, x, 14, magenta, magenta);

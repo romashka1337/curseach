@@ -130,6 +130,12 @@ int bc_setBCH(char s, long int *digit) {
 		case '7': digit[0] = BCH.Seven[0]; digit[1] = BCH.Seven[1]; break;
 		case '8': digit[0] = BCH.Eight[0]; digit[1] = BCH.Eight[1]; break;
 		case '9': digit[0] = BCH.Nine[0]; digit[1] = BCH.Nine[1]; break;
+		case 'A': digit[0] = BCH.A[0]; digit[1] = BCH.A[1]; break;
+        case 'B': digit[0] = BCH.B[0]; digit[1] = BCH.B[1]; break;
+        case 'C': digit[0] = BCH.C[0]; digit[1] = BCH.C[1]; break;
+        case 'D': digit[0] = BCH.D[0]; digit[1] = BCH.D[1]; break;
+        case 'E': digit[0] = BCH.E[0]; digit[1] = BCH.E[1]; break;
+        case 'F': digit[0] = BCH.F[0]; digit[1] = BCH.F[1]; break;
 		case '+': digit[0] = BCH.Plus[0]; digit[1] = BCH.Plus[1]; break;
 		case '-': digit[0] = BCH.Minus[0]; digit[1] = BCH.Minus[1]; break;
 		default: break;
