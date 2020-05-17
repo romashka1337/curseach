@@ -98,7 +98,7 @@ int sc_memoryLoad(char *filename){
 
 int sc_commandEncode(int command, int operand, int *value) {
 	if ((command <= 128) && (command >= 0) && (operand <= 128) && (operand >= 0)) {
-		if ((command >= 0x10 && command <= 0x11) || (command >= 0x20 && command <= 0x21) || (command >= 0x30 && command <= 0x33) || (command >= 0x40 && command <= 0x43) || (command >= 0x51 && command <= 0x76)) {
+		if ((command >= 0x10 && command <= 0x11) || (command >= 0x20 && command <= 0x21) || (command >= 0x30 && command <= 0x33) || (command >= 0x40 && command <= 0x43) || (command >= 0x63 && command <= 0x63)) {
 			*value = (command << 7) + operand;
 			*value = *value & (~(1 << 14));
 			return 0;
@@ -114,16 +114,12 @@ int sc_commandEncode(int command, int operand, int *value) {
 int sc_commandDecode(int value, int *command, int *operand) {
 	int temp = value;
 	if (((value >> 14) & (0x1)) != 0) {
+		sc_regSet(IGNORING_TACT_PULSES, 1);
 		sc_regSet(CODE_ERROR, 1);
 		return 1;
 	}
 	value = temp;
 	value = (value >> 7);
-	if ((value <= 15 || value >= 18) && (value <= 31 || value >= 34) && (value <= 47 || value >= 52) && (value <= 63 || value >= 68) && (value <= 80 || value >= 119)) {
-		value = temp;
-		sc_regSet(CODE_ERROR, 1);
-		return 1;
-	}
 	*command = value;
 	value = temp;
 	value = value & ((1 << 6) - 1);
@@ -137,6 +133,38 @@ int sc_instCounterGet(int* value) {
 }
 
 int sc_instCounterSet(int value) {
+	if (value >= 100 || value <= -1) {
+		sc_regSet(MEMORY_OVERFLOW, 1);
+		return -1;
+	}
 	instCounter = value;
+	return 0;
+}
+
+int sc_accumulatorGet(int* value) {
+	*value = accumulator;
+	return 0;
+}
+
+int sc_accumulatorSet(int value) {
+	if (value >= 0xFFFF || value <= -0xFFFF) {
+		sc_regSet(MEMORY_OVERFLOW, 1);
+		return -1;
+	}
+	accumulator = value;
+	return 0;
+}
+
+int sc_paintGet(int* value) {
+	*value = paintCount;
+	return 0;
+}
+
+int sc_paintSet(int value) {
+	if (value >= 0xFFFF || value <= -0xFFFF) {
+		sc_regSet(MEMORY_OVERFLOW, 1);
+		return -1;
+	}
+	paintCount = value;
 	return 0;
 }

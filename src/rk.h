@@ -12,10 +12,12 @@ enum keys {
 	Step,//t
 	Reset,//i
 	Accumulator,//f5
-	InstructionComputer,//f6
+	InstructionCounter,//f6
 	Quit,//q 
-	Right,//d
-	Left,//a
+	Right,//>
+	Left,//<
+	Down,//v
+	Up,//^
 	PlusValue,//+
 	MinusValue,//-
 	Register0,//0

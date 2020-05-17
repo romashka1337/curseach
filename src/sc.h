@@ -4,6 +4,8 @@
 static int register_flag = 0;
 static int RAM[100];
 static int instCounter = 0;
+static int accumulator = 0x6006;
+static int paintCount = 0;
 
 #define MEMORY_OVERFLOW 0 
 #define DIVISION_ERROR_BY_0 1 
@@ -23,3 +25,7 @@ int sc_commandEncode(int, int, int*);
 int sc_commandDecode(int, int*, int*);
 int sc_instCounterGet(int*);
 int sc_instCounterSet(int);
+int sc_accumulatorGet(int*);
+int sc_accumulatorSet(int);
+int sc_paintGet(int*);
+int sc_paintSet(int);

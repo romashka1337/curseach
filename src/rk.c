@@ -4,8 +4,8 @@ struct termios savetty;
 
 
 int rk_readkey(enum keys *Key) {
-	char str[8] = {0};
-	read(0, str, 8);
+	char str[6] = {0};
+	read(0, str, 6);
 	if (str[0] == 'q')
 		(*Key) = Quit;
 	else if (str[0] == 'l')
@@ -18,13 +18,17 @@ int rk_readkey(enum keys *Key) {
 		(*Key) = Step;
 	else if (str[0] == 'i')
 		(*Key) = Reset;
-	else if (strcmp(str, "\033[15~") == 0)
+	else if (str[0] == '\033' && str[2] == '1' && str[3] == '5')
 		(*Key) = Accumulator;
-	else if (strcmp(str, "\033[17~") == 0)
-		(*Key) = InstructionComputer;
-	else if (str[0] == 'd')
+	else if (str[0] == '\033' && str[2] == '1' && str[3] == '7')
+		(*Key) = InstructionCounter;
+	else if (str[0] == '\033' && str[2] == 'A')
+		(*Key) = Up;
+	else if (str[0] == '\033' && str[2] == 'B')
+		(*Key) = Down;
+	else if (str[0] == '\033' && str[2] == 'C')
 		(*Key) = Right;
-	else if (str[0] == 'a')
+	else if (str[0] == '\033' && str[2] == 'D')
 		(*Key) = Left;
 	else if (str[0] == '+')
 		(*Key) = PlusValue;

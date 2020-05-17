@@ -7,7 +7,7 @@ BINDIR = bin
 OBJDIR = build
 SRCDIR = src
 LIBNME = lib.a
-LIBOBJ = $(OBJDIR)/sc.o $(OBJDIR)/mt.o $(OBJDIR)/bc.o $(OBJDIR)/rk.o $(OBJDIR)/graphics.o
+LIBOBJ = $(OBJDIR)/sc.o $(OBJDIR)/mt.o $(OBJDIR)/bc.o $(OBJDIR)/rk.o $(OBJDIR)/graphics.o $(OBJDIR)/alu.o
 
 all: folders $(OBJDIR)/$(LIBNME) $(BINDIR)/$(TARGET)
 
