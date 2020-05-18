@@ -1,8 +1,11 @@
 #include "alu.h"
 
 int alu_read(int adress) {
+	char in[5] = {0};
+	printf("Enter value:");
+	fgets(in, 5, stdin);
 	int value = 0;
-	scanf("%d", &value);
+	sscanf(in, "%X", &value);
 	int temp = 0;
 	temp = sc_memorySet(adress, value);
 	if (temp) return -1;
@@ -15,6 +18,7 @@ int alu_write(int adress) {
 	temp = sc_memoryGet(adress, &value);
 	if (temp) return -1;
 	printf("%.4X", value);
+	getchar();
 	return 0;
 }
 
@@ -41,7 +45,7 @@ int alu_add(int adress) {
 	sc_memoryGet(adress, &value);
 	sc_accumulatorGet(&accum_value);
 	accum_value += value;
-	if(accum_value <= 0x3FFF && accum_value >= -0x3FFF) {
+	if(accum_value >= 0x3FFF || accum_value <= -0x3FFF) {
 		sc_regSet(MEMORY_OVERFLOW, 1);
 		return -1;
 	}
@@ -54,7 +58,7 @@ int alu_sub(int adress) {
 	sc_memoryGet(adress, &value);
 	sc_accumulatorGet(&accum_value);
 	accum_value -= value;
-	if(accum_value <= 0x3FFF && accum_value >= -0x3FFF) {
+	if(accum_value >= 0x3FFF || accum_value <= -0x3FFF) {
 		sc_regSet(MEMORY_OVERFLOW, 1);
 		return -1;
 	}
@@ -71,7 +75,7 @@ int alu_divide(int adress) {
 		return -1;
 	}
 	accum_value /= value;
-	if(accum_value <= 0x3FFF && accum_value >= -0x3FFF) {
+	if(accum_value >= 0x3FFF || accum_value <= -0x3FFF) {
 		sc_regSet(MEMORY_OVERFLOW, 1);
 		return -1;
 	}
@@ -84,7 +88,7 @@ int alu_multiply(int adress) {
 	sc_memoryGet(adress, &value);
 	sc_accumulatorGet(&accum_value);
 	accum_value *= value;
-	if(accum_value <= 0x3FFF && accum_value >= -0x3FFF) {
+	if(accum_value >= 0x3FFF || accum_value <= -0x3FFF) {
 		sc_regSet(MEMORY_OVERFLOW, 1);
 		return -1;
 	}
@@ -100,15 +104,21 @@ int alu_jump(int adress) {
 int alu_jneg(int adress) {
 	int value = 0;
 	sc_accumulatorGet(&value);
-	if (value < 0) sc_paintSet(adress);
-	return 0;
+	if (value < 0) {
+		sc_paintSet(adress);
+		return -1;
+	}
+	return 1;
 }
 
 int alu_jz(int adress) {
 	int value = 0;
 	sc_accumulatorGet(&value);
-	if (value == 0) sc_paintSet(adress);
-	return 0;
+	if (value == 0) {
+		sc_paintSet(adress);
+		return -1;
+	}
+	return 1;
 }
 
 int alu_halt() {
@@ -144,26 +154,21 @@ int alu_cu() {
 	temp = sc_commandDecode(ram, &command, &operand);
 	if (temp) return -1;
 	switch (command) {
-		case 0x10: temp = alu_read(operand); if (temp) return -1; break;
-		case 0x11: temp = alu_write(operand); if (temp) return -1; break;
-		case 0x20: temp = alu_load(operand); if (temp) return -1; break;
-		case 0x21: temp = alu_store(operand); if (temp) return -1; break;
-		case 0x30: temp = alu_alu(command, operand); if (temp) return -1; break;
-		case 0x31: temp = alu_alu(command, operand); if (temp) return -1; break;
-		case 0x32: temp = alu_alu(command, operand); if (temp) return -1; break;
-		case 0x33: temp = alu_alu(command, operand); if (temp) return -1; break;
-		case 0x40: temp = alu_jump(operand); if (temp) return -1; break;
-		case 0x41: temp = alu_jneg(operand); if (temp) return -1; break;
-		case 0x42: temp = alu_jz(operand); if (temp) return -1; break;
-		case 0x43: temp = alu_halt(); if (temp) return -1; break;
-		case 0x63: temp = alu_rcr(operand); if (temp) return -1; break;
+		case 0x10: temp = alu_read(operand); if (temp) return -1; temp = 1; break;
+		case 0x11: temp = alu_write(operand); if (temp) return -1; temp = 1; break;
+		case 0x20: temp = alu_load(operand); if (temp) return -1; temp = 1; break;
+		case 0x21: temp = alu_store(operand); if (temp) return -1; temp = 1; break;
+		case 0x30: temp = alu_alu(command, operand); if (temp) { printf("\nalu error "); getchar(); return -1; } temp = 1; break;
+		case 0x31: temp = alu_alu(command, operand); if (temp) { printf("\nalu error "); getchar(); return -1; } temp = 1; break;
+		case 0x32: temp = alu_alu(command, operand); if (temp) { printf("\nalu error "); getchar(); return -1; } temp = 1; break;
+		case 0x33: temp = alu_alu(command, operand); if (temp) { printf("\nalu error "); getchar(); return -1; } temp = 1; break;
+		case 0x40: temp = alu_jump(operand); temp = operand - value; break;
+		case 0x41: temp = alu_jneg(operand); if (temp == -1) temp = operand - value; break;
+		case 0x42: temp = alu_jz(operand); if (temp == -1) temp = operand - value; break;
+		case 0x43: return 1; break;
+		case 0x63: temp = alu_rcr(operand); if (temp) return -1; temp = 1; break;
 	}
-	switch (command) {
-		case 0x40: temp = operand - value; break;
-		case 0x41: temp = operand - value; break;
-		case 0x42: temp = operand - value; break;
-		default: temp = 1; break;
-	}
+	
 	sc_instCounterGet(&value);
 	sc_instCounterSet(value + temp);
 	return 0;

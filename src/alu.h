@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sc.h"
+#include <stdio.h>
 
 int alu_read(int);
 int alu_write(int);

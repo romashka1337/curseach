@@ -48,7 +48,7 @@ int gr_printRegFlag(void) {
 int gr_interface() {
 	mt_clrscr();
 	int temp = 0;
-	sc_paintGet(&temp);
+	sc_instCounterGet(&temp);
 	gr_printMemory(temp);
 	int m = 0;
 	sc_memoryGet(temp, &m);
@@ -79,7 +79,7 @@ int gr_interface() {
 	mt_gotoXY(49, 14);
 	printf("l - load");
 	mt_gotoXY(49, 15);
-	printf("v - save");
+	printf("s - save");
 	mt_gotoXY(49, 16);
 	printf("r - run");
 	mt_gotoXY(49, 17);
@@ -168,12 +168,6 @@ int gr_input() {
 		sc_regGet(3, &value);
 		if (!value) {
 			switch (Key) {
-				case Load:
-					rk_mytermrestore();
-					break;
-				case Save:
-					rk_mytermsave();
-					break;
 				case Right: {
 					int temp = 0;
 					sc_paintGet(&temp);
@@ -183,6 +177,7 @@ int gr_input() {
 						temp = 0;
 					}
 					sc_paintSet(temp);
+					sc_instCounterSet(temp);
 					break;
 				}
 				case Left: {
@@ -194,6 +189,7 @@ int gr_input() {
 						temp = 99;
 					}
 					sc_paintSet(temp);
+					sc_instCounterSet(temp);
 					break;
 				}
 				case Up: {
@@ -205,6 +201,7 @@ int gr_input() {
 						temp -= 10;
 					}
 					sc_paintSet(temp);
+					sc_instCounterSet(temp);
 					break;
 				}
 				case Down: {
@@ -216,10 +213,15 @@ int gr_input() {
 						temp += 10;
 					}
 					sc_paintSet(temp);
+					sc_instCounterSet(temp);
 					break;
 				}
 				case Step: {
 					alu_cu();
+					break;
+				}
+				case Run: {
+					alarm(1);
 					break;
 				}
 				case PlusValue: {
@@ -330,6 +332,24 @@ int gr_input() {
 						printf("\nError");
 						getchar();
 					}
+					break;
+				}
+				case Load: {
+					char in[5];
+					printf("Enter filename:");
+					fgets(in, 5, stdin);
+					int value = 0;
+					value = sc_memoryLoad(in);
+					if (value) printf("\nError");
+					break;
+				}
+				case Save: {
+					char out[5];
+					printf("Enter filename:");
+					fgets(out, 5, stdin);
+					int value = 0;
+					value = sc_memorySave(out);
+					if (value) printf("\nError");
 					break;
 				}
 				default: break;

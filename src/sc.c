@@ -30,7 +30,7 @@ int sc_memoryInit() {
 	if (RAM != NULL) {
 		for (int it = 0; it < 100; ++it) {
 			RAM[it] = 0;
-	   }
+		}
 	   return 0;
 	} else {
 		return 1;
@@ -67,7 +67,7 @@ int sc_memoryGet(int address, int *value) {
 
 int sc_memorySave(char *filename) {
 	FILE *save = NULL;
-	save = fopen(filename, "wb");
+	save = fopen(filename, "w+b");
 	if (save == NULL) {
 		return 1;
 	}
@@ -76,7 +76,7 @@ int sc_memorySave(char *filename) {
 	return 0;
 }
 
-int sc_memoryLoad(char *filename){
+int sc_memoryLoad(char *filename) {
 	if (RAM != NULL) {
 		FILE *load = NULL;
 		load = fopen(filename, "rb");

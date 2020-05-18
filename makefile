@@ -9,14 +9,17 @@ SRCDIR = src
 LIBNME = lib.a
 LIBOBJ = $(OBJDIR)/sc.o $(OBJDIR)/mt.o $(OBJDIR)/bc.o $(OBJDIR)/rk.o $(OBJDIR)/graphics.o $(OBJDIR)/alu.o
 
-all: folders $(OBJDIR)/$(LIBNME) $(BINDIR)/$(TARGET)
+all: folders $(OBJDIR)/$(LIBNME) $(BINDIR)/$(TARGET) $(BINDIR)/sat
+
+$(BINDIR)/sat: $(SRCDIR)/sat.c
+	$(CC) $< -o $@
 
 folders:
 	if ! test -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
 	if ! test -d $(BINDIR); then mkdir -p $(BINDIR); fi
 
 $(BINDIR)/$(TARGET): $(OBJDIR)/$(TARGET).o
-	$(CC) $^ -o $@ $(OBJDIR)/$(LIBNME) -lm
+	$(CC) $< -o $@ $(OBJDIR)/$(LIBNME) -lm
 
 $(OBJDIR)/$(LIBNME): $(LIBOBJ)
 	ar rc $@ $^
@@ -31,3 +34,4 @@ $(OBJDIR)/$(TARGET).o: $(SRCDIR)/$(TARGET).c $(LIBOBJ)
 clean:
 	if test -d $(OBJDIR); then rm -r $(OBJDIR); fi
 	if test -d $(BINDIR); then rm -r $(BINDIR); fi
+	rm *.o
