@@ -171,7 +171,7 @@ int gr_input() {
 				case Right: {
 					int temp = 0;
 					sc_paintGet(&temp);
-					if (temp < 100) {
+					if (temp < 99) {
 						temp++;
 					} else {
 						temp = 0;
@@ -183,7 +183,7 @@ int gr_input() {
 				case Left: {
 					int temp = 0;
 					sc_paintGet(&temp);
-					if (temp >= 0) {
+					if (temp > 0) {
 						temp--;
 					} else {
 						temp = 99;
@@ -306,7 +306,7 @@ int gr_input() {
 				}
 				case Accumulator: {
 					char acc[10];
-					printf("Enter Accumulator: ");
+					printf("\nEnter Accumulator: ");
 					fgets(acc, 10, stdin);
 					int acc_copy = 0;
 					acc[strlen(acc) - 1] = '\0';
@@ -321,14 +321,15 @@ int gr_input() {
 				}
 				case InstructionCounter: {
 					char ic[10];
-					printf("Enter InstructionCounter: ");
+					printf("\nEnter InstructionCounter: ");
 					fgets(ic, 10, stdin);
-                    getchar();
+                    //getchar();
 					int ic_copy = 0;
 					ic[strlen(ic) - 1] = '\0';
 					if(strlen(ic) <= 2) {
 						sscanf(ic, "%02d", &ic_copy);
 						sc_instCounterSet(ic_copy);
+                        sc_paintSet(ic_copy);
 					} else {
 						printf("\nError");
 						getchar();
@@ -337,7 +338,7 @@ int gr_input() {
 				}
 				case Load: {
 					char in[5];
-					printf("Enter filename:");
+					printf("\nEnter filename:");
 					fgets(in, 5, stdin);
                     getchar();
 					int value = 0;
@@ -347,7 +348,7 @@ int gr_input() {
 				}
 				case Save: {
 					char out[5];
-					printf("Enter filename:");
+					printf("\nEnter filename:");
 					fgets(out, 5, stdin);
                     getchar();
 					int value = 0;
