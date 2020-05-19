@@ -323,6 +323,7 @@ int gr_input() {
 					char ic[10];
 					printf("Enter InstructionCounter: ");
 					fgets(ic, 10, stdin);
+                    getchar();
 					int ic_copy = 0;
 					ic[strlen(ic) - 1] = '\0';
 					if(strlen(ic) <= 2) {
@@ -338,6 +339,7 @@ int gr_input() {
 					char in[5];
 					printf("Enter filename:");
 					fgets(in, 5, stdin);
+                    getchar();
 					int value = 0;
 					value = sc_memoryLoad(in);
 					if (value) printf("\nError");
@@ -347,6 +349,7 @@ int gr_input() {
 					char out[5];
 					printf("Enter filename:");
 					fgets(out, 5, stdin);
+                    getchar();
 					int value = 0;
 					value = sc_memorySave(out);
 					if (value) printf("\nError");
