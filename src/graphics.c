@@ -29,18 +29,56 @@ int gr_printMemory(int number) {
 
 int gr_printRegFlag(void) {
 	mt_gotoXY(69, 11);
-	for (int it = 0; it < 5; ++it) {
-		int CheckBitRegister = 0;
-		sc_regGet(it, &CheckBitRegister);
-		if (CheckBitRegister == 1) {
-			mt_setfgcolor(yellow);
-			printf("%d ", it);
-			mt_setfgcolor(reset);
-		} else {
-			mt_setfgcolor(reset);
-			printf("%d ", it);
-			mt_setfgcolor(reset);
-		}
+	int CheckBitRegister = 0;
+	sc_regGet(0, &CheckBitRegister);
+	if (CheckBitRegister == 1) {
+		mt_setfgcolor(yellow);
+		printf("M ");
+		mt_setfgcolor(reset);
+	} else {
+		mt_setfgcolor(reset);
+		printf("M ");
+		mt_setfgcolor(reset);
+	}
+	sc_regGet(1, &CheckBitRegister);
+	if (CheckBitRegister == 1) {
+		mt_setfgcolor(yellow);
+		printf("0 ");
+		mt_setfgcolor(reset);
+	} else {
+		mt_setfgcolor(reset);
+		printf("0 ");
+		mt_setfgcolor(reset);
+	}
+	sc_regGet(2, &CheckBitRegister);
+	if (CheckBitRegister == 1) {
+		mt_setfgcolor(yellow);
+		printf("B ");
+		mt_setfgcolor(reset);
+	} else {
+		mt_setfgcolor(reset);
+		printf("B ");
+		mt_setfgcolor(reset);
+	}
+	sc_regGet(3, &CheckBitRegister);
+	if (CheckBitRegister == 1) {
+		mt_setfgcolor(yellow);
+		printf("I ");
+		mt_setfgcolor(reset);
+	} else {
+		mt_setfgcolor(reset);
+		printf("I ");
+		mt_setfgcolor(reset);
+	}
+	sc_regGet(4, &CheckBitRegister);
+	if (CheckBitRegister == 1) {
+		mt_setfgcolor(yellow);
+		printf("C ");
+		mt_setfgcolor(reset);
+	} else {
+		mt_setfgcolor(reset);
+		printf("C ");
+		mt_setfgcolor(reset);
 	}
 	return 0;
 }
@@ -152,8 +190,8 @@ int gr_printAccum(void) {
 	mt_setfgcolor(reset);
 	int value = 0;
 	sc_accumulatorGet(&value);
-	if(value <= 0x3FFF && value >= -0x3FFF) printf("+%.4X", value);
-	else printf("%.4X", value);
+	if(value <= 0x3FFF && value >= -0x3FFF) printf("+%04X", value);
+	else printf("%04X", value);
 	mt_gotoXY(1, 25);
 	return 0;
 }
@@ -166,7 +204,7 @@ int gr_input() {
 		rk_readkey(&Key);
 		int value = 0;
 		sc_regGet(3, &value);
-		if (!value) {
+		if (value == 1) {
 			switch (Key) {
 				case Right: {
 					int temp = 0;
@@ -221,6 +259,7 @@ int gr_input() {
 					break;
 				}
 				case Run: {
+					sc_regSet(3, 0);
 					alarm(1);
 					break;
 				}
@@ -323,13 +362,13 @@ int gr_input() {
 					char ic[10];
 					printf("\nEnter InstructionCounter: ");
 					fgets(ic, 10, stdin);
-                    //getchar();
+					//getchar();
 					int ic_copy = 0;
 					ic[strlen(ic) - 1] = '\0';
 					if(strlen(ic) <= 2) {
 						sscanf(ic, "%02d", &ic_copy);
 						sc_instCounterSet(ic_copy);
-                        sc_paintSet(ic_copy);
+						sc_paintSet(ic_copy);
 					} else {
 						printf("\nError");
 						getchar();
@@ -340,7 +379,7 @@ int gr_input() {
 					char in[5];
 					printf("\nEnter filename:");
 					fgets(in, 5, stdin);
-                    getchar();
+					getchar();
 					int value = 0;
 					value = sc_memoryLoad(in);
 					if (value) printf("\nError");
@@ -350,10 +389,21 @@ int gr_input() {
 					char out[5];
 					printf("\nEnter filename:");
 					fgets(out, 5, stdin);
-                    getchar();
+					getchar();
 					int value = 0;
 					value = sc_memorySave(out);
 					if (value) printf("\nError");
+					break;
+				}
+				case Reset: {
+					sc_memoryInit();
+					sc_accumulatorSet(0);
+					sc_instCounterSet(0);
+					sc_regSet(0, 0);
+					sc_regSet(1, 0);
+					sc_regSet(2, 0);
+					sc_regSet(3, 1);
+					sc_regSet(4, 0);
 					break;
 				}
 				default: break;

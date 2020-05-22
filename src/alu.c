@@ -1,6 +1,7 @@
 #include "alu.h"
 
 int alu_read(int adress) {
+	sc_regSet(3, 1);
 	char in[5] = {0};
 	printf("Enter value:");
 	fgets(in, 5, stdin);
@@ -8,17 +9,20 @@ int alu_read(int adress) {
 	sscanf(in, "%X", &value);
 	int temp = 0;
 	temp = sc_memorySet(adress, value);
+	sc_regSet(3, 0);
 	if (temp) return -1;
 	return 0;
 }
 
 int alu_write(int adress) {
+	sc_regSet(3, 1);
 	int value = 0;
 	int temp = 0;
 	temp = sc_memoryGet(adress, &value);
 	if (temp) return -1;
 	printf("%.4X", value);
 	getchar();
+	sc_regSet(3, 0);
 	return 0;
 }
 
@@ -128,7 +132,7 @@ int alu_halt() {
 int alu_rcr(int adress) {
 	int value = 0, temp = 1;
 	sc_memoryGet(adress, &value);
-	temp = value | 1;
+	temp = value;
 	temp = temp << 14;
 	value = value >> 1;
 	value = value | temp;

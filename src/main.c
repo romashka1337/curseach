@@ -8,6 +8,7 @@ void signalhandler(int signo) {
 		getchar();
 	}
 	if (temp == 1) {
+		sc_regSet(3, 1);
 		printf("End");
 		getchar();
 		alarm(0);
@@ -25,7 +26,8 @@ int main() {
 	sc_memoryInit();
 	rk_mytermsave();
 	sc_memorySet(0, 0x2003);
-	sc_memorySet(3, 0x3113);
+	sc_memorySet(3, 0x2180);
+	sc_regSet(3, 1);
 	rk_mytermregime(0, 0, 0, 0, 0);
 	gr_input();
 	rk_mytermregime(0, 0, 1, 1, 1);
