@@ -59,9 +59,9 @@ using namespace std;
 		ram++;
 		string result = to_string(ram) + " JUMP " + to_string(ram + 2) + "\n";
 		ram++;
-		var['/' + to_string(ram)] = ram;
+		var['!' + to_string(ram)] = ram;
 		result += to_string(ram) + " =\t" + variable + "\n";
-		variable = '/' + to_string(ram);
+		variable = '!' + to_string(ram);
 		return result;
 	}
 	string basic::micro_math(string& s, char op) {
@@ -85,15 +85,15 @@ using namespace std;
 		ram++;
 		result += to_string(ram) + command + to_string(var[var2]) + "\n";
 		string temp;
-		if (var1.find_first_of('/') == string::npos and var2.find_first_of('/') == string::npos) {
+		if (var1.find_first_of('!') == string::npos and var2.find_first_of('!') == string::npos) {
 			ram++;
 			result += to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
 			ram++;
-			temp = '/' + to_string(ram);
+			temp = '!' + to_string(ram);
 			var[temp] = ram;
-		} else if (var1.find_first_of('/') != string::npos) {
+		} else if (var1.find_first_of('!') != string::npos) {
 			temp = var1;
-		} else if (var2.find_first_of('/') != string::npos) {
+		} else if (var2.find_first_of('!') != string::npos) {
 			temp = var2;
 		}
 		ram++;
@@ -107,7 +107,7 @@ using namespace std;
 		while (opening != string::npos) {
 			ram++;
 			result += to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
-			string temp = '/' + to_string(ram);
+			string temp = '!' + to_string(ram);
 			var[temp] = ram;
 			int closing = find_closing(s, opening);
 			result += do_math(s.substr(opening + 1, closing - opening - 1));
@@ -116,14 +116,19 @@ using namespace std;
 			result += to_string(ram) + " STORE\t" + to_string(var[temp]) + "\n";
 			opening = s.find_first_of('(');
 		}
-		while (s.find_first_of('/') != string::npos)
-			result += micro_math(s, '/');
-		while (s.find_first_of('*') != string::npos)
-			result += micro_math(s, '*');
-		while (s.find_first_of('+') != string::npos)
-			result += micro_math(s, '+');
-		while (s.find_first_of('-') != string::npos)
-			result += micro_math(s, '-');
+		while (s.find_first_of('/') != string::npos or s.find_first_of('*') != string::npos or 
+			s.find_first_of('+') != string::npos or s.find_first_of('-') != string::npos) {
+			while (s.find_first_of('/') != string::npos or s.find_first_of('*') != string::npos)
+				if (s.find_first_of('/') != string::npos and s.find_first_of('/') < s.find_first_of('*'))
+					result += micro_math(s, '/');
+				else if (s.find_first_of('*') != string::npos and s.find_first_of('*') < s.find_first_of('/'))
+					result += micro_math(s, '*');
+			while (s.find_first_of('+') != string::npos or s.find_first_of('-') != string::npos)
+				if (s.find_first_of('+') != string::npos and s.find_first_of('+') < s.find_first_of('-')) 
+					result += micro_math(s, '+');
+				else if (s.find_first_of('-') != string::npos and s.find_first_of('-') < s.find_first_of('+'))
+					result += micro_math(s, '-');
+		}
 		if (is_number(s))
 			result += create(s);
 		ram++;
@@ -153,6 +158,8 @@ using namespace std;
 				return ans;
 			} else if (command == "REM") {
 				prev[stoi(number)] =  -1;
+				ans = make_pair(1, "");
+				return ans;
 			} else if (command == "INPUT") {
 				ram += 3;
 				string operand;
@@ -252,6 +259,7 @@ using namespace std;
 				}
 				temp = cond;
 				todo_todo += temp;
+				temp.pop_back();
 				if (oper == 0) {
 					auto op = temp.find_first_of("==");
 					string var1 = temp.substr(0, op);
@@ -270,6 +278,7 @@ using namespace std;
 					if (var2.size() > 2) 
 						var2 = '(' + var2 + ')';
 					string math = var1 + "- " + var2;
+					cout << math << endl;
 					result += do_math(math);
 					prev[stoi(number)] =  ram;
 					ram++;
@@ -306,6 +315,30 @@ using namespace std;
 			string s;
 			getline(in, s);
 			pair<int, string> result = translate(s, false);
+			switch (result.first) {
+				case -1: {
+					cout << "wrong line order" << endl;
+					exit(-1);
+				}
+				case -2: {
+					cout << "wrong variable name" << endl;
+					exit(-2);
+				}
+				case -3: {
+					cout << "variable already exists" << endl;
+					exit(-3);
+				}
+				case -4: {
+					cout << "unable to create variable" << endl;
+					exit(-4);
+				}
+				case -5: {
+					cout << "wrong command" << endl;
+					exit(-5);
+				}
+				default:
+					break;
+			}
 			as += result.second;
 		}
 		int a;
@@ -319,16 +352,6 @@ using namespace std;
 			}
 			as = as.substr(0, a) + to_string(prev[stoi(as.substr(a + 1, a + count))]) + as.substr(a + count);
 		}
-		// while (as.find_first_of('@') != string::npos) {
-		// 	a = as.find_first_of('@');
-		// 	int count = 0;
-		// 	char c = '/';
-		// 	while (a + count < as.size()) {
-		// 		if (as[a + count] == '\n') break;
-		// 		count++;
-		// 	}
-		// 	as = as.substr(0, a) + to_string(ram++) + as.substr(a + count);
-		// }
 		out << as;
 		in.close();
 		out.close();

@@ -122,7 +122,7 @@ int sc_commandDecode(int value, int *command, int *operand) {
 	value = (value >> 7);
 	*command = value;
 	value = temp;
-	value = value & ((1 << 6) - 1);
+	value = value & ((1 << 7) - 1);
 	*operand = value;
 	return 0;
 }

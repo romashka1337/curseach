@@ -12,6 +12,19 @@ int commandEncode(int command, int operand, int *value) {
 		return 1;
 	};
 }
+int commandDecode(int value, int *command, int *operand) {
+	int temp = value;
+	if (((value >> 14) & (0x1)) != 0) {
+		return 1;
+	}
+	value = temp;
+	value = (value >> 7);
+	*command = value;
+	value = temp;
+	value = value & ((1 << 7) - 1);
+	*operand = value;
+	return 0;
+}
 
 int main(int argc, char **argv) {
 	for (int it = 0; it < 100; ++it) ram[it] = 0;
@@ -92,7 +105,9 @@ int main(int argc, char **argv) {
 		if (strcmp(b, "=") == 0) {
 			ram[a] = c;
 		}
-		printf("%d %s %d %04X\n", a, b, c, value);
+		printf("%d %s %d %02X%02X %04X", a, b, c, command, operand, value);
+		commandDecode(value, &command, &operand);
+		printf(" %02X%02X\n", command, operand);
 	}
 	fclose(in);
 	FILE *out;
