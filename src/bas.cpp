@@ -76,18 +76,18 @@ using namespace std;
 		if (is_number(var2)) 
 			result += create(var2);
 		string command;
-		if (op == '/') command = " DIVIDE ";
-		else if (op == '*') command = " MUL ";
-		else if (op == '+') command = " ADD ";
-		else if (op == '-') command = " SUB ";
+		if (op == '/') command = " DIVIDE\t";
+		else if (op == '*') command = " MUL\t";
+		else if (op == '+') command = " ADD\t";
+		else if (op == '-') command = " SUB\t";
 		ram++;
-		result += to_string(ram) + " LOAD " + to_string(var[var1]) + "\n";
+		result += to_string(ram) + " LOAD\t" + to_string(var[var1]) + "\n";
 		ram++;
-		result += to_string(ram) + " " + command + " " + to_string(var[var2]) + "\n";
+		result += to_string(ram) + command + to_string(var[var2]) + "\n";
 		string temp;
 		if (var1.find_first_of('/') == string::npos and var2.find_first_of('/') == string::npos) {
 			ram++;
-			result += to_string(ram) + " JUMP " + to_string(ram + 2) + "\n";
+			result += to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
 			ram++;
 			temp = '/' + to_string(ram);
 			var[temp] = ram;
@@ -98,7 +98,7 @@ using namespace std;
 		}
 		ram++;
 		s = s.substr(0, get_left_index(s, operation)) + temp + s.substr(get_right_index(s, operation) + 1);
-		result += to_string(ram) + " STORE " + to_string(var[temp]) + "\n";
+		result += to_string(ram) + " STORE\t" + to_string(var[temp]) + "\n";
 		return result;
 	}
 	string basic::do_math(string s) {
@@ -106,14 +106,14 @@ using namespace std;
 		string result;
 		while (opening != string::npos) {
 			ram++;
-			result += to_string(ram) + " JUMP " + to_string(ram + 2) + "\n";
+			result += to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
 			string temp = '/' + to_string(ram);
 			var[temp] = ram;
 			int closing = find_closing(s, opening);
 			result += do_math(s.substr(opening + 1, closing - opening - 1));
 			s = s.substr(0, opening) + temp + s.substr(closing + 1);
 			ram++;
-			result += to_string(ram) + " STORE " + to_string(var[temp]) + "\n";
+			result += to_string(ram) + " STORE\t" + to_string(var[temp]) + "\n";
 			opening = s.find_first_of('(');
 		}
 		while (s.find_first_of('/') != string::npos)
@@ -127,7 +127,7 @@ using namespace std;
 		if (is_number(s))
 			result += create(s);
 		ram++;
-		result += to_string(ram) + " LOAD " + to_string(var[s]) + "\n";
+		result += to_string(ram) + " LOAD\t" + to_string(var[s]) + "\n";
 		return result;
 	}
 	pair<int, string> basic::translate(string line, bool _if) {
@@ -148,7 +148,8 @@ using namespace std;
 			if (command == "END") {
 				ram++;
 				prev[stoi(number)] =  ram;
-				ans = make_pair(1, to_string(ram) + " HALT " + "00");
+				ans = make_pair(1, to_string(ram) + " HALT\t" + "00");
+				ram++;
 				return ans;
 			} else if (command == "REM") {
 				prev[stoi(number)] =  -1;
@@ -162,7 +163,7 @@ using namespace std;
 				}
 				var[string(1, operand[0])] = ram;
 				prev[stoi(number)] =  ram - 2;
-				ans = make_pair(1, to_string(ram - 2) + " READ " + to_string(ram) + "\n" + to_string(ram - 1) + " JUMP " + to_string(ram + 1) + "\n");
+				ans = make_pair(1, to_string(ram - 2) + " READ\t" + to_string(ram) + "\n" + to_string(ram - 1) + " JUMP\t" + to_string(ram + 1) + "\n");
 				return ans;
 			} else if (command ==  "OUTPUT") {
 				ram++;
@@ -172,7 +173,7 @@ using namespace std;
 				if (var.count(string(1, operand[0])) != 0) {
 					// exists
 					prev[stoi(number)] =  ram;
-					ans = make_pair(1, to_string(ram) + " WRITE " + to_string(var[string(1, operand[0])]) + "\n");
+					ans = make_pair(1, to_string(ram) + " WRITE\t" + to_string(var[string(1, operand[0])]) + "\n");
 					return ans;
 				} else {
 					// doesnt exist -> create, make it zero and write
@@ -180,23 +181,14 @@ using namespace std;
 					var[string(1, operand[0])] = ram;
 					prev[stoi(number)] =  ram - 2;
 					ans = make_pair(1, to_string(ram - 2) + " =\t" + "0" + "\n" +  
-					to_string(ram - 1) + " WRITE " + to_string(var[string(1, operand[0])]) + "\n");
+					to_string(ram - 1) + " WRITE\t" + to_string(var[string(1, operand[0])]) + "\n");
 					return ans;
 				}
 			} else if (command == "GOTO") {
 				ram++;
 				int operand;
 				s >> operand;
-				int gt = 0;
-				if (prev[operand] == -1) {
-					// rem -> next goto next line
-					for (auto it : prev)
-						if (it.first > prev[operand]) {
-							gt = it.second;
-							break;
-						}
-				} else gt = prev[operand];
-				ans = make_pair(1, to_string(ram) + " JUMP " + to_string(gt) + "\n");
+				ans = make_pair(1, to_string(ram) + " JUMP\t" + '/' + to_string(operand) + "\n");
 				ram++;
 				return ans;
 			} else if (command == "LET") {
@@ -223,7 +215,7 @@ using namespace std;
 						string str = s.str().substr(todo_todo.size());
 						result += do_math(str);
 						ram++;
-						result += to_string(ram) + " STORE " + to_string(var[string(1, variable[0])]) + "\n";
+						result += to_string(ram) + " STORE\t" + to_string(var[string(1, variable[0])]) + "\n";
 						ans = make_pair(1, result);
 						return ans;
 					}
@@ -270,8 +262,7 @@ using namespace std;
 					result += do_math(math);
 					prev[stoi(number)] =  ram;
 					ram++;
-					result += to_string(ram) + " JZ " + to_string(ram + 2) + "\n";
-					ram++;
+					result += to_string(ram) + " JZ\t" + to_string(ram + 2) + "\n";
 				} else if (oper == 1) {
 					auto op = temp.find_first_of("<");
 					string var1 = temp.substr(0, op);
@@ -282,8 +273,7 @@ using namespace std;
 					result += do_math(math);
 					prev[stoi(number)] =  ram;
 					ram++;
-					result += to_string(ram) + " JNEG " + to_string(ram + 2) + "\n";
-					ram++;
+					result += to_string(ram) + " JNEG\t" + to_string(ram + 2) + "\n";
 				} else if (oper == 1) {
 					auto op = temp.find_first_of(">");
 					string var1 = temp.substr(0, op);
@@ -294,13 +284,14 @@ using namespace std;
 					result += do_math(math);
 					prev[stoi(number)] =  ram;
 					ram++;
-					result += to_string(ram) + " JNEG " + to_string(ram + 2) + "\n";
-					ram++;
+					result += to_string(ram) + " JNEG\t" + to_string(ram + 2) + "\n";
 				}
+				ram++;
+				int jump_to = ram;
 				string str = s.str().substr(todo_todo.size());
 				pair<int, string> todo = translate(str, true);
-				result += todo.second;
-				result += to_string(ram) + " JUMP " + to_string(ram + 1) + "\n";
+				result += to_string(jump_to) + " JUMP\t" + to_string(ram + 1) + "\n";
+				result += todo.second ;
 				ans = make_pair(1, result);
 				return ans;
 			}
@@ -310,12 +301,35 @@ using namespace std;
 	void basic::read(string input, string output) {
 		ifstream in(input);
 		ofstream out(output);
+		string as;
 		while (!in.eof()) {
 			string s;
 			getline(in, s);
 			pair<int, string> result = translate(s, false);
-			out << result.second;
+			as += result.second;
 		}
+		int a;
+		while (as.find_first_of('/') != string::npos) {
+			a = as.find_first_of('/');
+			int count = 0;
+			char c = '/';
+			while (a + count < as.size()) {
+				if (as[a + count] == '\n') break;
+				count++;
+			}
+			as = as.substr(0, a) + to_string(prev[stoi(as.substr(a + 1, a + count))]) + as.substr(a + count);
+		}
+		// while (as.find_first_of('@') != string::npos) {
+		// 	a = as.find_first_of('@');
+		// 	int count = 0;
+		// 	char c = '/';
+		// 	while (a + count < as.size()) {
+		// 		if (as[a + count] == '\n') break;
+		// 		count++;
+		// 	}
+		// 	as = as.substr(0, a) + to_string(ram++) + as.substr(a + count);
+		// }
+		out << as;
 		in.close();
 		out.close();
 	}
