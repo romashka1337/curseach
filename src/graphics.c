@@ -127,7 +127,7 @@ int gr_interface() {
 	mt_gotoXY(49, 19);
 	printf("F5 - accumulator");
 	mt_gotoXY(49, 20);
-	printf("F6 - instrictionComputer\n");
+	printf("F6 - instrictionCounter\n");
 	mt_gotoXY(50, 24);
 	printf("\n");
 	mt_gotoXY(1, 23);
