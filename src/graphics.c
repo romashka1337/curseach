@@ -139,10 +139,11 @@ int gr_drawBCH(int digit) {
 	char str[2] = {0}, str1[2] = {0}, str2[2] = {0};
 	long int BigDigit[2] = {0};
 	if(digit <= 0x3FFF && digit >= -0x3FFF) {
-		bc_setBCH('+', BigDigit);
+		/*if(digit >= 0)  */bc_setBCH('+', BigDigit);
+        //else    bc_setBCH('-', BigDigit);
 		bc_printbigchar(BigDigit, 2, 14, magenta, magenta);
 		int command = 0, operand = 0;
-		sc_commandDecode(digit, &command, &operand);
+		printf("%d",sc_commandDecode(digit, &command, &operand));
 		sprintf(str1, "%.2X", command);
 		sprintf(str2, "%.2X", operand);
 		for(int it = 0, x = 11; it < 2; ++it, x += 9) {
@@ -190,8 +191,12 @@ int gr_printAccum(void) {
 	mt_setfgcolor(reset);
 	int value = 0;
 	sc_accumulatorGet(&value);
-	if(value <= 0x3FFF && value >= -0x3FFF) printf("+%04X", value);
-	else printf("%04X", value);
+	if(value <= 0x3FFF && value >= 0)   printf("+%04X", value);
+	else 
+    {   if(value <= -0x0) 
+            value*=-1;
+        printf("-%04X", value);    
+    }
 	mt_gotoXY(1, 25);
 	return 0;
 }
@@ -256,6 +261,7 @@ int gr_input() {
 				}
 				case Step: {
 					alu_cu();
+                    sc_regSet(3, 1);
 					break;
 				}
 				case Run: {
@@ -376,10 +382,13 @@ int gr_input() {
 					break;
 				}
 				case Load: {
-					char in[5];
+					char in[10];
 					printf("\nEnter filename:");
-					fgets(in, 5, stdin);
-					getchar();
+					fgets(in, 10, stdin);
+                    for(int i=0; i < 9; i++)
+                    {
+                        if(in[i] == '.' && in[i+1] == 'o')  in[i+2]='\0';
+                    }
 					int value = 0;
 					value = sc_memoryLoad(in);
 					if (value) printf("\nError");

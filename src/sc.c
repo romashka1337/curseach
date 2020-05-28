@@ -113,7 +113,7 @@ int sc_commandEncode(int command, int operand, int *value) {
 
 int sc_commandDecode(int value, int *command, int *operand) {
 	int temp = value;
-	if (((value >> 14) & (0x1)) != 0) {
+	if (((value >> 15) & (0x1)) != 0) {
 		sc_regSet(IGNORING_TACT_PULSES, 1);
 		sc_regSet(CODE_ERROR, 1);
 		return 1;

@@ -38,6 +38,7 @@ int alu_load(int adress) {
 int alu_store(int adress) {
 	int value = 0;
 	sc_accumulatorGet(&value);
+    if(value <= -0x0)   value*=-1;  
 	int temp = 0;
 	temp = sc_memorySet(adress, value);
 	if (temp) return -1;
