@@ -37,5 +37,5 @@ $(OBJDIR)/$(TARGET).o: $(SRCDIR)/$(TARGET).c $(LIBOBJ)
 clean:
 	if test -d $(OBJDIR); then rm -r $(OBJDIR); fi
 	if test -d $(BINDIR); then rm -r $(BINDIR); fi
-	rm *.o
-	rm *.sa
+	if test -f *.o; then rm *.o; fi
+	if test -f *.sa; then rm *.sa; fi

@@ -146,7 +146,7 @@ using namespace std;
 			pair<int, string> ans;
 			if (not _if) {
 				s >> number;
-				if (stoi(number) < pr) {
+				if (stoi(number) <= pr) {
 					ans = make_pair(-1, "");
 					return ans; // wrong line order
 				} else pr = stoi(number);
@@ -169,7 +169,7 @@ using namespace std;
 				ram += 3;
 				string operand;
 				s >> operand;
-				if (operand.size() > 1 and not isupper(operand[0])) {
+				if (operand.size() > 1 or not isupper(operand[0])) {
 					ans = make_pair(-2, "");
 					return ans; // wrong variable name
 				}
@@ -182,7 +182,7 @@ using namespace std;
 				string operand;
 				s >> operand;
 				prev[stoi(number)] =  ram;
-				if (operand.size() > 1 and not isupper(operand[0])) return make_pair(-2, ""); // wrong variable name
+				if (operand.size() > 1 or not isupper(operand[0])) return make_pair(-2, ""); // wrong variable name
 				if (var.count(string(1, operand[0])) != 0) {
 					// exists
 					ans = make_pair(1, to_string(ram) + " WRITE\t" + to_string(var[string(1, operand[0])]) + "\n");
@@ -208,7 +208,7 @@ using namespace std;
 				string variable;
 				s >> variable;
 				todo_todo += variable + ' ';
-				if (variable.size() > 1 and not isupper(variable[0])) return make_pair(-2, ""); // wrong variable name
+				if (variable.size() > 1 or not isupper(variable[0])) return make_pair(-2, ""); // wrong variable name
 				if (var.count(string(1, variable[0])) != 0) {
 					// exists
 					string store;
@@ -219,6 +219,7 @@ using namespace std;
 						return ans;
 					} else if (store[0] == '=' and store.size() == 1) {
 						string str = s.str().substr(todo_todo.size());
+						if (str == "") { ans = make_pair(-4, ""); return ans; }// unable to create variable
 						string result = do_math(str);
 						ram++;
 						result += to_string(ram) + " STORE\t" + to_string(var[string(1, variable[0])]) + "\n";
@@ -241,6 +242,7 @@ using namespace std;
 						return ans;
 					} else if (store[0] == '=' and store.size() == 1) {
 						string str = s.str().substr(todo_todo.size());
+						if (str == "") { ans = make_pair(-4, ""); return ans; }// unable to create variable
 						result += do_math(str);
 						ram++;
 						result += to_string(ram) + " STORE\t" + to_string(var[string(1, variable[0])]) + "\n";
