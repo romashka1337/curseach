@@ -38,3 +38,4 @@ clean:
 	if test -d $(OBJDIR); then rm -r $(OBJDIR); fi
 	if test -d $(BINDIR); then rm -r $(BINDIR); fi
 	rm *.o
+	rm *.sa

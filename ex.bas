@@ -1,7 +1,8 @@
-10 REM Это комментарий
-20 INPUT A
-30 INPUT B
-40 LET C = A - B
-50 IF C - A < A + B GOTO 20
-60 OUTPUT C
-70 END
+1 INPUT A
+2 LET B = 1
+3 IF A == 0 GOTO 7
+4 LET B = B * A
+5 LET A = A - 1
+6 GOTO 3
+7 OUTPUT B
+8 END

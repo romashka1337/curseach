@@ -57,7 +57,7 @@ using namespace std;
 	}
 	string basic::create(string& variable) {
 		ram++;
-		string result = to_string(ram) + " JUMP " + to_string(ram + 2) + "\n";
+		string result = to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
 		ram++;
 		var['!' + to_string(ram)] = ram;
 		result += to_string(ram) + " =\t" + variable + "\n";
@@ -92,9 +92,13 @@ using namespace std;
 			temp = '!' + to_string(ram);
 			var[temp] = ram;
 		} else if (var1.find_first_of('!') != string::npos) {
-			temp = var1;
+			counter++;
+			temp = '!' + var1;
+			var[temp] = 100 - counter;
 		} else if (var2.find_first_of('!') != string::npos) {
-			temp = var2;
+			counter++;
+			temp = '!' + var1;
+			var[temp] = 100 - counter;
 		}
 		ram++;
 		s = s.substr(0, get_left_index(s, operation)) + temp + s.substr(get_right_index(s, operation) + 1);
@@ -107,6 +111,7 @@ using namespace std;
 		while (opening != string::npos) {
 			ram++;
 			result += to_string(ram) + " JUMP\t" + to_string(ram + 2) + "\n";
+			ram++;
 			string temp = '!' + to_string(ram);
 			var[temp] = ram;
 			int closing = find_closing(s, opening);
@@ -176,36 +181,52 @@ using namespace std;
 				ram++;
 				string operand;
 				s >> operand;
+				prev[stoi(number)] =  ram;
 				if (operand.size() > 1 and not isupper(operand[0])) return make_pair(-2, ""); // wrong variable name
 				if (var.count(string(1, operand[0])) != 0) {
 					// exists
-					prev[stoi(number)] =  ram;
 					ans = make_pair(1, to_string(ram) + " WRITE\t" + to_string(var[string(1, operand[0])]) + "\n");
 					return ans;
 				} else {
 					// doesnt exist -> create, make it zero and write
 					ram += 2;
 					var[string(1, operand[0])] = ram;
-					prev[stoi(number)] =  ram - 2;
 					ans = make_pair(1, to_string(ram - 2) + " =\t" + "0" + "\n" +  
 					to_string(ram - 1) + " WRITE\t" + to_string(var[string(1, operand[0])]) + "\n");
 					return ans;
 				}
 			} else if (command == "GOTO") {
 				ram++;
+				prev[stoi(number)] =  ram;
 				int operand;
 				s >> operand;
 				ans = make_pair(1, to_string(ram) + " JUMP\t" + '/' + to_string(operand) + "\n");
 				ram++;
 				return ans;
 			} else if (command == "LET") {
+				prev[stoi(number)] =  ram + 1;
 				string variable;
 				s >> variable;
 				todo_todo += variable + ' ';
 				if (variable.size() > 1 and not isupper(variable[0])) return make_pair(-2, ""); // wrong variable name
 				if (var.count(string(1, variable[0])) != 0) {
 					// exists
-					ans = make_pair(-3, ""); // variable already exists
+					string store;
+					s >> store;
+					todo_todo += store + ' ';
+					if (store == "") { 
+						ans = make_pair(-3, ""); // variable already exists
+						return ans;
+					} else if (store[0] == '=' and store.size() == 1) {
+						string str = s.str().substr(todo_todo.size());
+						string result = do_math(str);
+						ram++;
+						result += to_string(ram) + " STORE\t" + to_string(var[string(1, variable[0])]) + "\n";
+						ans = make_pair(1, result);
+						return ans;
+					}
+					ans = make_pair(-4, ""); // unable to create variable
+					return ans;
 					return ans;
 				} else {
 					// doesnt exist
@@ -267,8 +288,8 @@ using namespace std;
 					if (var2.size() > 2) 
 						var2 = '(' + var2 + ')';
 					string math = var1 + "- " + var2;
+					prev[stoi(number)] =  ram + 1;
 					result += do_math(math);
-					prev[stoi(number)] =  ram;
 					ram++;
 					result += to_string(ram) + " JZ\t" + to_string(ram + 2) + "\n";
 				} else if (oper == 1) {
@@ -278,9 +299,8 @@ using namespace std;
 					if (var2.size() > 2) 
 						var2 = '(' + var2 + ')';
 					string math = var1 + "- " + var2;
-					cout << math << endl;
+					prev[stoi(number)] =  ram + 1;
 					result += do_math(math);
-					prev[stoi(number)] =  ram;
 					ram++;
 					result += to_string(ram) + " JNEG\t" + to_string(ram + 2) + "\n";
 				} else if (oper == 1) {
@@ -290,8 +310,8 @@ using namespace std;
 					if (var2.size() > 2) 
 						var2 = '(' + var2 + ')';
 					string math = var2 + "- " + var1;
+					prev[stoi(number)] =  ram + 1;
 					result += do_math(math);
-					prev[stoi(number)] =  ram;
 					ram++;
 					result += to_string(ram) + " JNEG\t" + to_string(ram + 2) + "\n";
 				}
@@ -347,7 +367,7 @@ using namespace std;
 			int count = 0;
 			char c = '/';
 			while (a + count < as.size()) {
-				if (as[a + count] == '\n') break;
+				if (as[a + count] == '\n' or as[a + count] == ' ' or as[a + count] == '\t') break;
 				count++;
 			}
 			as = as.substr(0, a) + to_string(prev[stoi(as.substr(a + 1, a + count))]) + as.substr(a + count);
