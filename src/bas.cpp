@@ -305,7 +305,7 @@ using namespace std;
 					result += do_math(math);
 					ram++;
 					result += to_string(ram) + " JNEG\t" + to_string(ram + 2) + "\n";
-				} else if (oper == 1) {
+				} else if (oper == 2) {
 					auto op = temp.find_first_of(">");
 					string var1 = temp.substr(0, op);
 					string var2 = temp.substr(op + 2);
