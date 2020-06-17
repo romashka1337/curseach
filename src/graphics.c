@@ -266,7 +266,21 @@ int gr_input() {
 				}
 				case Run: {
 					sc_regSet(3, 0);
-					alarm(1);
+					int temp = 0;
+					while (1) {
+						temp = alu_cu();
+						if (temp == -1) {
+							printf("\nprogram error");
+							getchar();
+						}
+						if (temp == 1) {
+							sc_regSet(3, 1);
+							printf("End");
+							getchar();
+							break;
+						}
+						gr_interface();
+					}
 					break;
 				}
 				case PlusValue: {
